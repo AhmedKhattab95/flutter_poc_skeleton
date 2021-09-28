@@ -1,0 +1,20 @@
+{
+  "appTitle": "معا",
+  "sampeItems": "بعض الامثله",
+  "settings": "الأعدادات",
+  "systemTheme": "مظهر النظام",
+  "lightTheme": "الوضع النهاري",
+  "darkTheme": "الوضع الليلي",
+  "english": "English",
+  "arabic": "العربية",
+  "latestItems": "العناصر المضافة حديثا",
+  "addMoreItems": "إضافة عناصر جديدة",
+  "addFree": "أضف ${price} لكي تحصل علي توصيل مجاني",
+  "@addFree": {
+    "description": "توصيل مجاني",
+    "placeholders": {
+      "price": {}
+    }
+  },
+  "cart": "عربة التسوق"
+}

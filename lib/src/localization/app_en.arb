@@ -1,0 +1,23 @@
+{
+  "appTitle": "Maan",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "sampeItems": "Sample items",
+  "settings": "Settings",
+  "systemTheme": "System Theme",
+  "lightTheme": "Light Theme",
+  "darkTheme": "Dark Theme",
+  "english": "English",
+  "arabic": "العربية",
+  "latestItems": "Latest Items",
+  "addMoreItems": "Add More Items",
+  "addFree": "Add ${price} for Free Delivery",
+  "@addFree": {
+    "description": "free delivery",
+    "placeholders": {
+      "price": {}
+    }
+  },
+  "cart": "Cart"
+}
