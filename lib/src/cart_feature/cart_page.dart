@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:my_app/src/cart_feature/models/product_model.dart';
 import 'package:my_app/src/theme/app_colors.dart';
-
-import 'cart_bloc/cart_bloc.dart';
+import 'package:provider/provider.dart';
 import 'models/cart_model.dart';
+import 'mvvm/cart_mvvm.dart';
 
 class CartPage extends StatelessWidget {
   static const routeName = '/cart';
@@ -19,61 +18,63 @@ class CartPage extends StatelessWidget {
     final localization = AppLocalizations.of(context)!;
 
     final theme = Theme.of(context);
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(localization.cart),
-        ),
-        // bottomNavigationBar: CustomNavBar(),
-        body: BlocBuilder<CartBloc, CartState>(
-          builder: (context, state) {
-            if (state is CartLoading) {
-              return Center(child: CircularProgressIndicator());
-            }
-            if (state is CartLoaded) {
-              return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(localization.addFree('50')),
-                        ElevatedButton(onPressed: () {}, child: Text(localization.addMoreItems))
-                      ],
-                    ),
-
-                    //============ products
-                    Expanded(
-                        child: ListView.builder(
-                      itemCount: state.cart.products.length,
-                      itemBuilder: (context, index) => CartProductCard(product: state.cart.products[index]),
-                    )),
-
-                    //==================== subtotal, Fees
-                    SizedBox(height: 16),
-                    _summaryDesing(context, state.cart),
-                    //=========== total
-                    Container(
-                      margin: const EdgeInsets.symmetric(vertical: 16.0),
-                      padding: summryPadding,
-                      height: 50.0,
-                      color: Theme.of(context).secondaryHeaderColor,
-                      child: Row(
+    return ChangeNotifierProvider<CartMvvm>.value(
+      value: CartMvvm.instance,
+      builder: (cxt, child) => Scaffold(
+          appBar: AppBar(
+            title: Text(localization.cart),
+          ),
+          // bottomNavigationBar: CustomNavBar(),
+          body: Consumer<CartMvvm>(
+            builder: (context, vm, state) {
+              if (vm.cartLoading) {
+                return Center(child: CircularProgressIndicator());
+              } else if (vm.cartLoaded) {
+                return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(children: [
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('TOTAL',
-                              style: theme.textTheme.subtitle2!
-                                  .copyWith(color: Theme.of(context).scaffoldBackgroundColor)),
-                          Text('\$${state.cart.totalString}',
-                              style: theme.textTheme.bodyText2!
-                                  .copyWith(color: Theme.of(context).scaffoldBackgroundColor)),
+                          Text(localization.addFree('50')),
+                          ElevatedButton(onPressed: () {}, child: Text(localization.addMoreItems))
                         ],
                       ),
-                    )
-                  ]));
-            } else
-              return Text('Error!!');
-          },
-        ));
+
+                      //============ products
+                      Expanded(
+                          child: ListView.builder(
+                        itemCount: vm.cart.products.length,
+                        itemBuilder: (context, index) => CartProductCard(product: vm.cart.products[index]),
+                      )),
+
+                      //==================== subtotal, Fees
+                      SizedBox(height: 16),
+                      _summaryDesing(context, vm.cart),
+                      //=========== total
+                      Container(
+                        margin: const EdgeInsets.symmetric(vertical: 16.0),
+                        padding: summryPadding,
+                        height: 50.0,
+                        color: Theme.of(context).secondaryHeaderColor,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('TOTAL',
+                                style: theme.textTheme.subtitle2!
+                                    .copyWith(color: Theme.of(context).scaffoldBackgroundColor)),
+                            Text('\$${vm.cart.totalString}',
+                                style: theme.textTheme.bodyText2!
+                                    .copyWith(color: Theme.of(context).scaffoldBackgroundColor)),
+                          ],
+                        ),
+                      )
+                    ]));
+              } else
+                return Text('Error!!');
+            },
+          )),
+    );
   }
 
   Widget _summaryDesing(BuildContext context, CartModel cart) {
@@ -120,10 +121,10 @@ class CartProductCard extends StatelessWidget {
     var imageWidth = MediaQuery.of(context).size.width / 2.7;
     var imageHeight = MediaQuery.of(context).size.width / 2.7;
 
-    return BlocBuilder<CartBloc, CartState>(builder: (context, state) {
-      if (state is CartLoading) {
+    return Consumer<CartMvvm>(builder: (context, vm, child) {
+      if (vm.cartLoading) {
         return Center(child: CircularProgressIndicator());
-      } else if (state is CartLoaded) {
+      } else if (vm.cartLoaded) {
         return Card(
           child: Row(
             mainAxisSize: MainAxisSize.max,
@@ -160,7 +161,8 @@ class CartProductCard extends StatelessWidget {
                       IconButton(
                         icon: Icon(Icons.remove_circle),
                         onPressed: () {
-                          context.read<CartBloc>().add(CartProductRemoved(product));
+                          //todo: remove product
+                          Provider.of<CartMvvm>(context, listen: false).removeProduct(product);
                           var snack = SnackBar(
                             duration: Duration(seconds: 1),
                             content: Text(
@@ -177,10 +179,16 @@ class CartProductCard extends StatelessWidget {
                       IconButton(
                         icon: Icon(Icons.add_circle),
                         onPressed: () {
-                          context.read<CartBloc>().add(CartProductAdded(product));
+                          // context.read<CartProvider>().add(CartProductAdded(product));
+
+                          Provider.of<CartMvvm>(context, listen: false).addProduct(product);
+
                           var snack = SnackBar(
                             duration: Duration(seconds: 1),
-                            content: Text('${product.name} has been added to cart!'),
+                            content: Text(
+                              '${product.name} has been added to cart!',
+                              style: Theme.of(context).textTheme.bodyText1!.copyWith(color: AppColors.green),
+                            ),
                           );
                           ScaffoldMessenger.of(context).showSnackBar(snack);
                         },
