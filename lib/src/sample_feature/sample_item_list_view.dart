@@ -26,6 +26,9 @@ class SampleItemListView extends StatefulWidget {
     Text(
       'Index 3: profile',
       style: optionStyle,
+    ),    Text(
+      'Index 4: Notification',
+      style: optionStyle,
     ),
 
   ];
@@ -97,7 +100,7 @@ class _SampleItemListViewState extends State<SampleItemListView> {
       body: SampleItemListView._widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         showUnselectedLabels: false,
-        items: [Icons.home, Icons.people, Icons.shopping_cart_rounded, Icons.person_pin, Icons.settings]
+        items: [Icons.home, Icons.people, Icons.shopping_cart_rounded, Icons.person_pin, Icons.notifications_outlined]
             .map((e) => BottomNavigationBarItem(
                   icon: getIcon(e),
                   title: getSelectedDesign(), /*backgroundColor: Colors.white*/

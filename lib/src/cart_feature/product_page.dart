@@ -1,12 +1,9 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_app/src/theme/app_colors.dart';
-import 'package:provider/provider.dart';
-
 import 'cart_page.dart';
-
 import 'models/product_model.dart';
 import 'mvvm/cart_mvvm.dart';
 
@@ -39,44 +36,40 @@ class ProductPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var imageWidth = MediaQuery.of(context).size.width / 2.7;
     var imageHeight = MediaQuery.of(context).size.width / 2;
-    return ChangeNotifierProvider<CartMvvm>.value(
-      value: CartMvvm.instance,
-      builder: (cxt, child) => Container(
-        margin: EdgeInsets.all(12),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            //------- carousle
-            _carousleDesign,
+    return Container(
+      margin: EdgeInsets.all(12),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          //------- carousle
+          _carousleDesign,
 
-            //------- title
-            _cartTitle(context),
+          //------- title
+          _cartTitle(context),
 
-            //------- grid
-            InkWell(
-              onTap: () {
-                Navigator.restorablePushNamed(context, CartPage.routeName);
-              },
-              child: Container(
-                height: imageHeight,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: products.length,
-                  itemBuilder: (BuildContext context, int index) =>
-                      _productCard(context, index, imageWidth, imageHeight),
+          //------- grid
+          InkWell(
+            onTap: () {
+              Navigator.restorablePushNamed(context, CartPage.routeName);
+            },
+            child: Container(
+              height: imageHeight,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: products.length,
+                itemBuilder: (BuildContext context, int index) => _productCard(context, index, imageWidth, imageHeight),
 
-                  // staggeredTileBuilder: (int index) => new StaggeredTile.count(
-                  //   2,
-                  //   (index == 0 || index.isOdd && index != 1) ? 2.2 :1.8 ,
-                  // ),
-                  // mainAxisSpacing: 4.0,
-                  // crossAxisSpacing: 4.0,
-                ),
+                // staggeredTileBuilder: (int index) => new StaggeredTile.count(
+                //   2,
+                //   (index == 0 || index.isOdd && index != 1) ? 2.2 :1.8 ,
+                // ),
+                // mainAxisSpacing: 4.0,
+                // crossAxisSpacing: 4.0,
               ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -187,21 +180,26 @@ class ProductPage extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(
-                icon: Icon(Icons.add_circle, color: AppColors.lightColor),
-                onPressed: () {
-                  //todo: add to cart
-                  var vm = Provider.of<CartMvvm>(context, listen: false);
-                  vm.addProduct(product);
-                  // context.read<CartProvider>().add(CartProductAdded(product));
-                  var snack = SnackBar(
-                    duration: Duration(seconds: 1),
-                    content: Text(
-                      '${product.name} has been added to cart!',
-                      style: TextStyle(color: AppColors.green),
-                    ),
+              Consumer(
+                builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                  return IconButton(
+                    icon: Icon(Icons.add_circle, color: AppColors.lightColor),
+                    onPressed: () {
+
+                      // var vm = Provider.of<CartMvvm>(context, listen: false);
+                      var vm = ref.read(CartChangeNotifierProvider);
+                      vm.addProduct(product);
+                      // context.read<CartProvider>().add(CartProductAdded(product));
+                      var snack = SnackBar(
+                        duration: Duration(seconds: 1),
+                        content: Text(
+                          '${product.name} has been added to cart!',
+                          style: TextStyle(color: AppColors.green),
+                        ),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snack);
+                    },
                   );
-                  ScaffoldMessenger.of(context).showSnackBar(snack);
                 },
               )
             ],

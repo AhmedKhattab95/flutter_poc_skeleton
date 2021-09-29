@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_app/src/cart_feature/models/product_model.dart';
 import 'package:my_app/src/theme/app_colors.dart';
-import 'package:provider/provider.dart';
+
 import 'models/cart_model.dart';
 import 'mvvm/cart_mvvm.dart';
 
@@ -18,63 +19,61 @@ class CartPage extends StatelessWidget {
     final localization = AppLocalizations.of(context)!;
 
     final theme = Theme.of(context);
-    return ChangeNotifierProvider<CartMvvm>.value(
-      value: CartMvvm.instance,
-      builder: (cxt, child) => Scaffold(
-          appBar: AppBar(
-            title: Text(localization.cart),
-          ),
-          // bottomNavigationBar: CustomNavBar(),
-          body: Consumer<CartMvvm>(
-            builder: (context, vm, state) {
-              if (vm.cartLoading) {
-                return Center(child: CircularProgressIndicator());
-              } else if (vm.cartLoaded) {
-                return Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(children: [
-                      Row(
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(localization.cart),
+        ),
+        // bottomNavigationBar: CustomNavBar(),
+        body: Consumer(
+          builder: (context, ref, state) {
+            var vm = ref.watch(CartChangeNotifierProvider);
+            if (vm.cartLoading) {
+              return Center(child: CircularProgressIndicator());
+            } else if (vm.cartLoaded) {
+              return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(localization.addFree('50')),
+                        ElevatedButton(onPressed: () {}, child: Text(localization.addMoreItems))
+                      ],
+                    ),
+
+                    //============ products
+                    Expanded(
+                        child: ListView.builder(
+                      itemCount: vm.cart.products.length,
+                      itemBuilder: (context, index) => CartProductCard(product: vm.cart.products[index]),
+                    )),
+
+                    //==================== subtotal, Fees
+                    SizedBox(height: 16),
+                    _summaryDesing(context, vm.cart),
+                    //=========== total
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 16.0),
+                      padding: summryPadding,
+                      height: 50.0,
+                      color: Theme.of(context).secondaryHeaderColor,
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(localization.addFree('50')),
-                          ElevatedButton(onPressed: () {}, child: Text(localization.addMoreItems))
+                          Text('TOTAL',
+                              style: theme.textTheme.subtitle2!
+                                  .copyWith(color: Theme.of(context).scaffoldBackgroundColor)),
+                          Text('\$${vm.cart.totalString}',
+                              style: theme.textTheme.bodyText2!
+                                  .copyWith(color: Theme.of(context).scaffoldBackgroundColor)),
                         ],
                       ),
-
-                      //============ products
-                      Expanded(
-                          child: ListView.builder(
-                        itemCount: vm.cart.products.length,
-                        itemBuilder: (context, index) => CartProductCard(product: vm.cart.products[index]),
-                      )),
-
-                      //==================== subtotal, Fees
-                      SizedBox(height: 16),
-                      _summaryDesing(context, vm.cart),
-                      //=========== total
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 16.0),
-                        padding: summryPadding,
-                        height: 50.0,
-                        color: Theme.of(context).secondaryHeaderColor,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('TOTAL',
-                                style: theme.textTheme.subtitle2!
-                                    .copyWith(color: Theme.of(context).scaffoldBackgroundColor)),
-                            Text('\$${vm.cart.totalString}',
-                                style: theme.textTheme.bodyText2!
-                                    .copyWith(color: Theme.of(context).scaffoldBackgroundColor)),
-                          ],
-                        ),
-                      )
-                    ]));
-              } else
-                return Text('Error!!');
-            },
-          )),
-    );
+                    )
+                  ]));
+            } else
+              return Text('Error!!');
+          },
+        ));
   }
 
   Widget _summaryDesing(BuildContext context, CartModel cart) {
@@ -121,7 +120,8 @@ class CartProductCard extends StatelessWidget {
     var imageWidth = MediaQuery.of(context).size.width / 2.7;
     var imageHeight = MediaQuery.of(context).size.width / 2.7;
 
-    return Consumer<CartMvvm>(builder: (context, vm, child) {
+    return Consumer(builder: (context, ref, child) {
+      final vm = ref.watch(CartChangeNotifierProvider);
       if (vm.cartLoading) {
         return Center(child: CircularProgressIndicator());
       } else if (vm.cartLoaded) {
@@ -162,7 +162,8 @@ class CartProductCard extends StatelessWidget {
                         icon: Icon(Icons.remove_circle),
                         onPressed: () {
                           //todo: remove product
-                          Provider.of<CartMvvm>(context, listen: false).removeProduct(product);
+                          // Provider.of<CartMvvm>(context, listen: false).removeProduct(product);
+                           vm.removeProduct(product);
                           var snack = SnackBar(
                             duration: Duration(seconds: 1),
                             content: Text(
@@ -181,7 +182,9 @@ class CartProductCard extends StatelessWidget {
                         onPressed: () {
                           // context.read<CartProvider>().add(CartProductAdded(product));
 
-                          Provider.of<CartMvvm>(context, listen: false).addProduct(product);
+                          // Provider.of<CartMvvm>(context, listen: false).addProduct(product);
+                          var viewModel = ref.read(CartChangeNotifierProvider);
+                          viewModel.addProduct(product);
 
                           var snack = SnackBar(
                             duration: Duration(seconds: 1),
