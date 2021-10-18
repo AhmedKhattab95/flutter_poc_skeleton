@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "43110456684",
+    "project_id": "flutter-test-solcial-login",
+    "storage_bucket": "flutter-test-solcial-login.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:43110456684:android:7a3ccbb7550b4fa8a5a749",
+        "android_client_info": {
+          "package_name": "com.example.my_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "43110456684-mnmsegkcflr9e4h99pkgdnbao9cbf9ah.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.my_app",
+            "certificate_hash": "6d34606c3aba6345686a68bcebdeb657bd22cc19"
+          }
+        },
+        {
+          "client_id": "43110456684-5ik93ur79pcfjlsr4c21ta03ktdhran4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUK4vntZQ0UI_k5mEMKJnXExW0p4s-JL8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "43110456684-5ik93ur79pcfjlsr4c21ta03ktdhran4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

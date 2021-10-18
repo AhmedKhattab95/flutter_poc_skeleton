@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_app/src/cart_feature/models/cart_model.dart';
 import 'package:my_app/src/cart_feature/models/product_model.dart';
 
-  final CartChangeNotifierProvider = ChangeNotifierProvider<CartMvvm>((ref) => CartMvvm.instance);
+final CartChangeNotifierProvider = ChangeNotifierProvider<CartMvvm>((ref) => CartMvvm.instance);
 
 class CartMvvm extends ChangeNotifier {
   //region singleton

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:my_app/core/core_lib.dart';
+import 'package:my_app/src/login_feature/login_page/login_page_view.dart';
 import 'cart_feature/cart_page.dart';
 import 'sample_feature/sample_item_details_view.dart';
-import 'sample_feature/sample_item_list_view.dart';
+import 'sample_feature/home_view.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 import 'theme/app_localization.dart';
@@ -28,6 +30,7 @@ class MyApp extends StatelessWidget {
       animation: settingsController,
       builder: (BuildContext context, Widget? child) {
         return MaterialApp(
+          navigatorKey: NavigationService.navigatorKey,
           // Providing a restorationScopeId allows the Navigator built by the
           // MaterialApp to restore the navigation stack when a user leaves and
           // returns to the app after it has been killed while running in the
@@ -67,15 +70,17 @@ class MyApp extends StatelessWidget {
               settings: routeSettings,
               builder: (BuildContext context) {
                 switch (routeSettings.name) {
+                  case LoginPageView.routeName:
+                    return LoginPageView();
                   case SettingsView.routeName:
                     return SettingsView(controller: settingsController);
                   case SampleItemDetailsView.routeName:
                     return const SampleItemDetailsView();
                   case CartPage.routeName:
                     return const CartPage();
-                  case SampleItemListView.routeName:
+                  case HomeView.routeName:
                   default:
-                    return SampleItemListView();
+                    return HomeView();
                 }
               },
             );
